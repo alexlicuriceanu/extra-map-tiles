@@ -1,1 +1,1 @@
-# Extra Map Tiles Version 2 resource for FiveM servers.
+# Extra Map Tiles resource for FiveM servers.
