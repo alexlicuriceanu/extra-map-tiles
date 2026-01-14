@@ -4,6 +4,10 @@ local vBitmapTileSizeY = 4500.0
 local vBitmapStartX = -4140.0
 local vBitmapStartY = 8400.0
 
+-- global variables
+local dummy_blips = {}
+local scaleform_minimap_main_map_handle = nil
+
 -- get the keys of a table.
 -- @param t The table to get the keys from.
 -- @return keys A sorted table containing the keys of the input table.
@@ -59,6 +63,20 @@ local function load_scaleform(scaleform_name)
     return scaleform_handle
 end
 
+-- refreshes the minimap by loading the minimap.gfx scaleform.
+local function refresh_minimap()
+    -- Load the minimap.gfx scaleform to fix minimap rendering on first load
+    scaleform_minimap_handle = load_scaleform(config.scaleform_minimap)
+    SetBigmapActive(true, false)
+    Citizen.Wait(0)
+    SetBigmapActive(false, false)
+
+    -- Reset the scaleform handle (now pointing to minimap.gfx) to nil
+    scaleform_minimap_handle = SetScaleformMovieAsNoLongerNeeded(scaleform_minimap_handle)
+    scaleform_minimap_handle = nil
+end
+
+
 -- create an invisible blip at the specified coordinates.
 -- @param x The x coordinate of the blip.
 -- @param y The y coordinate of the blip.
@@ -75,52 +93,57 @@ end
 -- "hack" the pause menu map bounds by creating dummy blips
 -- at the corners of the furthest tiles.
 local function extend_pause_menu_map_bounds()
+    for _, blip in ipairs(dummy_blips) do
+        RemoveBlip(blip)
+    end
+    dummy_blips = {}
+    
     local keys = get_keys(config.tiles)
-
     if #keys == 0 then
         return
     end
 
-    -- Set starting values for the search
-    local x_min_offset = config.tiles[keys[1]].x_offset or 0
-    local x_max_offset = config.tiles[keys[1]].x_offset or 0
-    local y_min_offset = config.tiles[keys[1]].y_offset or 0
-    local y_max_offset = config.tiles[keys[1]].y_offset or 0
+    local x_min_offset = 1e5
+    local x_max_offset = -1e5
+    local y_min_offset = 1e5
+    local y_max_offset = -1e5
+    local found = false
 
-    for i = 2, #keys do
+    for i = 1, #keys do
         local tile = config.tiles[keys[i]]
+        local alpha = tonumber(tile.alpha) or 100
+
+        if alpha <= 0 then
+            goto continue
+        end
 
         if tile.x_offset then
-            if tile.x_offset < x_min_offset then
-                x_min_offset = tile.x_offset
-            elseif tile.x_offset > x_max_offset then
-                x_max_offset = tile.x_offset
-            end
+            x_min_offset = math.min(x_min_offset, tile.x_offset)
+            x_max_offset = math.max(x_max_offset, tile.x_offset)
         end
 
         if tile.y_offset then
-            if tile.y_offset < y_min_offset then
-                y_min_offset = tile.y_offset
-            elseif tile.y_offset > y_max_offset then
-                y_max_offset = tile.y_offset
-            end
+            y_min_offset = math.min(y_min_offset, tile.y_offset)
+            y_max_offset = math.max(y_max_offset, tile.y_offset)
         end
+
+        found = true
+        ::continue::
     end
 
-    x_min = vBitmapStartX + x_min_offset * vBitmapTileSizeX
-    x_max = vBitmapStartX + x_max_offset * vBitmapTileSizeX
-    y_min = vBitmapStartY - y_min_offset * vBitmapTileSizeY
-    y_max = vBitmapStartY - y_max_offset * vBitmapTileSizeY
+    if not found then
+        return
+    end
 
-    x_max = x_max + vBitmapTileSizeX
-    y_max = y_max - vBitmapTileSizeY
+    local x_min = vBitmapStartX + x_min_offset * vBitmapTileSizeX
+    local x_max = vBitmapStartX + x_max_offset * vBitmapTileSizeX + vBitmapTileSizeX
+    local y_min = vBitmapStartY - y_min_offset * vBitmapTileSizeY
+    local y_max = vBitmapStartY - y_max_offset * vBitmapTileSizeY - vBitmapTileSizeY
 
-    -- Top left corner
-    create_dummy_blip(x_min, y_min)
-
-    -- Bottom right corner
-    create_dummy_blip(x_max, y_max)
+    table.insert(dummy_blips, create_dummy_blip(x_min, y_min))
+    table.insert(dummy_blips, create_dummy_blip(x_max, y_max))
 end
+
 
 
 -- creates a tile based on the provided configuration.
@@ -140,6 +163,11 @@ local function draw_tile(scaleform_handle, tile)
     EndScaleformMovieMethod()
 end
 
+
+-- sets the alpha value of a tile.
+-- @param scaleform_handle The handle of the scaleform to set the tile alpha on.
+-- @param tile The configuration table for the tile.
+-- @param alpha The alpha value to set for the tile (0-100).
 local function set_tile_alpha(scaleform_handle, tile, alpha)
     BeginScaleformMovieMethod(scaleform_handle, "SET_TILE_ALPHA")
     PushScaleformMovieFunctionParameterString(tile.name) 
@@ -147,8 +175,71 @@ local function set_tile_alpha(scaleform_handle, tile, alpha)
     EndScaleformMovieMethod()
 end 
 
+-- export function: shows a specific tile on the pause menu map.
+-- @param tile_name The name of the tile to show.
+local function export_show_tile(tile_name)
+
+end
+
+
+-- export function: hides a specific tile on the pause menu map.
+-- @param tile_name The name of the tile to hide.
+local function export_hide_tile(tile_name)
+
+end
+
+
+-- export function: shows all tiles on the pause menu map.
+local function export_show_all_tiles()
+
+end
+
+
+-- export function: hides all tiles on the pause menu map.
+local function export_hide_all_tiles()
+
+end
+
+
+
+-- export function: checks if a specific tile is visible on the pause menu map.
+-- @param tile_name The name of the tile to check.
+-- @return is_visible True if the tile is visible, false otherwise.
+local function export_is_tile_visible(tile_name)
+    local tile_config = config.tiles[tile_name]
+    if not tile_config then
+        return false
+    end
+
+    local alpha = tonumber(tile_config.alpha) or 0
+    return alpha > 0
+end
+
+-- export function: refreshes the minimap to apply changes.
+local function export_refresh_minimap()
+    refresh_minimap()
+end
+
+
+
+exports("show_tile", export_show_tile)
+exports("hide_tile", export_hide_tile)
+exports("show_all_tiles", export_show_all_tiles)
+exports("hide_all_tiles", export_hide_all_tiles)
+exports("is_tile_visible", export_is_tile_visible)
+exports("refresh_minimap", export_refresh_minimap)
 
 Citizen.CreateThread(function()
+    -- Set up alphas
+    for _, tile_name in ipairs(get_keys(config.tiles)) do
+        if not config.tiles[tile_name].alpha then
+            config.tiles[tile_name].alpha = 100
+        end
+    end
+
+    -- TODO: global scaleform handle to avoid reloading every time
+    -- TODO: rewrite export functions
+
     -- Load texture dictionaries and main map scaleform
     local loaded_texture_dictionaries = load_texture_dictionaries(config.tiles)
     local scaleform_handle = load_scaleform(config.scaleform_minimap_main_map)
@@ -214,8 +305,7 @@ Citizen.CreateThread(function()
             }
 
             draw_tile(scaleform_handle, tile)
-            set_tile_alpha(scaleform_handle, tile, tile_config.alpha or 100)
-            tile_config.alpha = tile_config.alpha or 100
+            set_tile_alpha(scaleform_handle, tile, tile_config.alpha)
         end
     end
 
@@ -223,15 +313,8 @@ Citizen.CreateThread(function()
     scaleform_handle = SetScaleformMovieAsNoLongerNeeded(scaleform_handle)
     scaleform_handle = nil
 
-    -- Load the minimap.gfx scaleform to fix minimap rendering on first load
-    scaleform_handle = load_scaleform(config.scaleform_minimap)
-    SetBigmapActive(true, false)
-    Citizen.Wait(0)
-    SetBigmapActive(false, false)
-
-    -- Reset the scaleform handle (now pointing to minimap.gfx) to nil
-    scaleform_handle = SetScaleformMovieAsNoLongerNeeded(scaleform_handle)
-    scaleform_handle = nil
+    -- Fix minimap rendering on first load
+    refresh_minimap()
 
     -- Clean up loaded texture dictionaries
     for _, texture_dict in ipairs(loaded_texture_dictionaries) do

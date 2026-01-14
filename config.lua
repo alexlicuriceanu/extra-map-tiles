@@ -1,4 +1,3 @@
-
 config = {}
 config.scaleform_minimap_main_map = "minimap_main_map"  -- Do not modify
 config.scaleform_minimap = "minimap"    -- Do not modify
@@ -6,7 +5,7 @@ config.offset = 0.1    -- Small overlap between adjacent tiles to hide seams
 
 -- Removes the blur effect applied on the edges of the minimap
 -- See forum post for more details: https://forum.cfx.re/t/extra-map-tiles-v2-add-extra-textured-tiles-on-the-pause-menu-map-and-minimap-new-and-revamped-version/5344181
-config.remove_blur = false
+config.remove_blur = true
 config.radar_masks = "radar_masks"
 
 
@@ -30,11 +29,13 @@ config.radar_masks = "radar_masks"
 ]]
 config.tiles = {
 
-    --[1] = {x_offset = -1, y_offset = 0, txd = "minimap_sea_0_-1", txn = "minimap_sea_0_-1"},
-    --[2] = {x_offset = -1, y_offset = 1, txd = "minimap_sea_1_-1", txn = "minimap_sea_1_-1"},
-    [3] = {x_offset = -1, y_offset = 2, txd = "minimap_sea_2_-1", txn = "minimap_sea_2_-1"},
-    [4] = {x_offset = 2, y_offset = 2, txd = "cayo_perico", txn = "minimap_sea_4_4"},
-    [5] = {x_offset = 1, y_offset = 3, txd = "cayo_perico", txn = "minimap_sea_5_3", alpha = 50},
-    [6] = {x_offset = 2, y_offset = 3, txd = "cayo_perico", txn = "minimap_sea_5_4"},
-    [7] = {x_offset = 0, y_offset = -1, txd = "roxwood", txn = "minimap_sea_-1_0"},
+    -- 2 example tiles in the south-east of the main map
+    [1] = {x_offset = 2, y_offset = 1, txd = "extra_tiles_blue", txn = "tile_1"},
+    [2] = {x_offset = 2, y_offset = 2, txd = "extra_tiles_blue", txn = "tile_2"},
+
+    -- 4 example tiles in the north-west of the main map 
+    [3] = {x_offset = -1, y_offset = -1, txd = "extra_tiles_green_1", txn = "tile_3"},
+    [4] = {x_offset = 0, y_offset = -1, txd = "extra_tiles_green_1", txn = "tile_4", alpha = 0},
+    [5] = {x_offset = -1, y_offset = 0, txd = "extra_tiles_green_2", txn = "tile_5"},
+    [6] = {x_offset = -1, y_offset = 1, txd = "extra_tiles_green_2", txn = "tile_6"},
 }
