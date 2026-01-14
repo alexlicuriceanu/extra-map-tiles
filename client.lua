@@ -183,7 +183,7 @@ Citizen.CreateThread(function()
     -- Draw the extra tiles
     for _, tile_name in ipairs(get_keys(config.tiles)) do
         local tile_config = config.tiles[tile_name]
-
+        
         if tile_config then
             local x = x_origin + (tile_config.x_offset or 0) * tile_size
             local y = y_origin + (tile_config.y_offset or 0) * tile_size
@@ -214,7 +214,8 @@ Citizen.CreateThread(function()
             }
 
             draw_tile(scaleform_handle, tile)
-            set_tile_alpha(scaleform_handle, tile, 100)
+            set_tile_alpha(scaleform_handle, tile, tile_config.alpha or 100)
+            tile_config.alpha = tile_config.alpha or 100
         end
     end
 

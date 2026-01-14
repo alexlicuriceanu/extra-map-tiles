@@ -34,7 +34,7 @@ config.tiles = {
     --[2] = {x_offset = -1, y_offset = 1, txd = "minimap_sea_1_-1", txn = "minimap_sea_1_-1"},
     [3] = {x_offset = -1, y_offset = 2, txd = "minimap_sea_2_-1", txn = "minimap_sea_2_-1"},
     [4] = {x_offset = 2, y_offset = 2, txd = "cayo_perico", txn = "minimap_sea_4_4"},
-    [5] = {x_offset = 1, y_offset = 3, txd = "cayo_perico", txn = "minimap_sea_5_3"},
+    [5] = {x_offset = 1, y_offset = 3, txd = "cayo_perico", txn = "minimap_sea_5_3", alpha = 50},
     [6] = {x_offset = 2, y_offset = 3, txd = "cayo_perico", txn = "minimap_sea_5_4"},
     [7] = {x_offset = 0, y_offset = -1, txd = "roxwood", txn = "minimap_sea_-1_0"},
 }
