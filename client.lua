@@ -4,7 +4,7 @@ local vBitmapTileSizeY = 4500.0
 local vBitmapStartX = -4140.0
 local vBitmapStartY = 8400.0
 
--- Function to get the keys of a table.
+-- get the keys of a table.
 -- @param t The table to get the keys from.
 -- @return keys A sorted table containing the keys of the input table.
 local function get_keys(t)
@@ -20,7 +20,7 @@ local function get_keys(t)
 end
 
 
--- Function that loads the texture dictionaries specified in the configuration file.
+-- loads the texture dictionaries specified in the configuration file.
 -- @param texture_dictionaries Table containing the tiles configuration.
 -- @return loaded_texture_dictionaries A table containing the names loaded texture dictionaries.
 local function load_texture_dictionaries(texture_dictionaries)
@@ -44,7 +44,7 @@ local function load_texture_dictionaries(texture_dictionaries)
 end
 
 
--- Function that requests and loads a scaleform file.
+-- requests and loads a scaleform file.
 -- @param scaleform_name The name of the scaleform file to load.
 -- @return scaleform_handle The handle of the loaded scaleform.
 local function load_scaleform(scaleform_name)
@@ -59,7 +59,7 @@ local function load_scaleform(scaleform_name)
     return scaleform_handle
 end
 
--- Function to create an invisible blip at the specified coordinates.
+-- create an invisible blip at the specified coordinates.
 -- @param x The x coordinate of the blip.
 -- @param y The y coordinate of the blip.
 -- @return The handle of the created blip.
@@ -72,7 +72,7 @@ local function create_dummy_blip(x, y)
 end
 
 
--- Function to "hack" the pause menu map bounds by creating dummy blips
+-- "hack" the pause menu map bounds by creating dummy blips
 -- at the corners of the furthest tiles.
 local function extend_pause_menu_map_bounds()
     local keys = get_keys(config.tiles)
@@ -123,7 +123,7 @@ local function extend_pause_menu_map_bounds()
 end
 
 
--- Function that creates a tile based on the provided configuration.
+-- creates a tile based on the provided configuration.
 -- @param scaleform_handle The handle of the scaleform to draw the tile on.
 -- @param tile The configuration table for the tile.
 local function draw_tile(scaleform_handle, tile)
@@ -140,23 +140,20 @@ local function draw_tile(scaleform_handle, tile)
     EndScaleformMovieMethod()
 end
 
+local function set_tile_alpha(scaleform_handle, tile, alpha)
+    BeginScaleformMovieMethod(scaleform_handle, "SET_TILE_ALPHA")
+    PushScaleformMovieFunctionParameterString(tile.name) 
+    PushScaleformMovieFunctionParameterInt(math.floor(alpha))
+    EndScaleformMovieMethod()
+end 
+
 
 Citizen.CreateThread(function()
-    -- SetMapZoomDataLevel(0, 0.26, 0.9, 0.08, 0.0, 0.0)
-    -- SetMapZoomDataLevel(1, 1.6, 0.9, 0.08, 0.0, 0.0)
-    -- SetMapZoomDataLevel(2, 8.6, 0.9, 0.08, 0.0, 0.0)
-    -- SetMapZoomDataLevel(3, 12.3, 0.9, 0.08, 0.0, 0.0)
-    -- SetMapZoomDataLevel(4, 24.3, 0.9, 0.08, 0.0, 0.0)
-    -- SetMapZoomDataLevel(5, 55.0, 0.0, 0.1, 2.0, 1.0)
-    -- SetMapZoomDataLevel(6, 450.0, 0.0, 0.1, 1.0, 1.0)
-    -- SetMapZoomDataLevel(7, 4.5, 0.0, 0.0, 0.0, 0.0)
-    -- SetMapZoomDataLevel(8, 11.0, 0.0, 0.0, 2.0, 3.0)
-
     -- Load texture dictionaries and main map scaleform
     local loaded_texture_dictionaries = load_texture_dictionaries(config.tiles)
     local scaleform_handle = load_scaleform(config.scaleform_minimap_main_map)
 
-    -- Clean un any leftover textures in the main map scaleform
+    -- Clean any leftover textures in the main map scaleform
     BeginScaleformMovieMethod(scaleform_handle, "CLEAR_TEXTURES")
     EndScaleformMovieMethod()
 
@@ -217,6 +214,7 @@ Citizen.CreateThread(function()
             }
 
             draw_tile(scaleform_handle, tile)
+            set_tile_alpha(scaleform_handle, tile, 100)
         end
     end
 
