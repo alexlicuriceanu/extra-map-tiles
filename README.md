@@ -88,14 +88,11 @@ This resource takes up virtually no CPU cycles - 0.00ms shown on resmon.
 
 
 # Other information
-- Tested on server build 17000 and game build 2944 on 15/01/2026 - fully working.
+- Tested on server build 17000 and game build 3258 on 15/01/2026 - fully working.
 - Although it is not a good practice, you can use a trial-and-error approach by restarting the resource when configuring tiles - Define the config, change offset values, txd or txn, restart the resource. Changes should take effect after opening and closing the pause menu - no need to restart the client or the server. After you have the tiles at the correct positions, stop and restart the server. Only do this when configuring tiles, never on a live server as it may lead to visual bugs.
 - In theory, compatibility with other resources that modify the minimap (circular, square minimaps, etc - not pause menu map) should not be a problem.
 - Ideally, your textures should have a 1:1 aspect ratio, in order to not get skewed when mapping to a tile, which has a 1:1 ratio.
-- Again, ideally export your textures to DDS DXT5 (aka BC3) format with the maximum number of mipmaps possible for the best clarity and to avoid aliasing artifacts when zooming out the main menu map in-game:
-
-
-
+- Again, ideally export your textures to DDS DXT5 (aka BC3) format with the maximum number of mipmaps possible for the best clarity and to avoid aliasing artifacts when zooming out the main menu map in-game.
 - Depending on the placement of your extra tiles, some minor visual bugs (sharp cutoff of extra tiles) may occur with the minimap's blur mask when the minimap is tiled (i.e. when in a vehicle). The current "solution" is to stream a custom mask that disables the blur. Other workarounds could be writing a script to not tilt the map at all - blur with extra tiles works perfectly fine when on foot. Most of the time this is not even noticeable, I just want to make everything perfect. This feature can be toggled in the config file:
 
 ![Minimap blur on and off|690x306](./images/blurs.png)
