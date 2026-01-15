@@ -178,6 +178,10 @@ end
 -- export function: shows the specified tiles on the pause menu map.
 -- @param tile_names A table containing the names of the tiles to show.
 local function export_show_tiles(tile_names)
+    if tile_names == nil then
+        return
+    end
+
     for _, tile_name in ipairs(tile_names) do
         local tile = {
             name = tostring(tile_name),
@@ -195,6 +199,10 @@ end
 -- export function: hides the specified tiles on the pause menu map.
 -- @param tile_names A table containing the names of the tiles to hide.
 local function export_hide_tiles(tile_names)
+    if tile_names == nil then
+        return
+    end
+
     for _, tile_name in ipairs(tile_names) do
         local tile = {
             name = tostring(tile_name),
