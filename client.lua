@@ -19,7 +19,6 @@ local function get_keys(t)
   end
 
   table.sort(keys)
-
   return keys
 end
 
@@ -111,7 +110,7 @@ local function extend_pause_menu_map_bounds()
 
     for i = 1, #keys do
         local tile = config.tiles[keys[i]]
-        local alpha = tonumber(tile.alpha) or 100
+        local alpha = tonumber(tile.alpha)
 
         if alpha <= 0 then
             goto continue
@@ -175,31 +174,39 @@ local function set_tile_alpha(scaleform_handle, tile, alpha)
     EndScaleformMovieMethod()
 end 
 
--- export function: shows a specific tile on the pause menu map.
--- @param tile_name The name of the tile to show.
-local function export_show_tile(tile_name)
 
+-- export function: shows the specified tiles on the pause menu map.
+-- @param tile_names A table containing the names of the tiles to show.
+local function export_show_tiles(tile_names)
+    for _, tile_name in ipairs(tile_names) do
+        local tile = {
+            name = tostring(tile_name),
+        }
+
+        set_tile_alpha(scaleform_minimap_main_map_handle, tile, 100)
+        config.tiles[tile_name].alpha = 100
+    end
+
+    refresh_minimap()
+    extend_pause_menu_map_bounds()
 end
 
 
--- export function: hides a specific tile on the pause menu map.
--- @param tile_name The name of the tile to hide.
-local function export_hide_tile(tile_name)
+-- export function: hides the specified tiles on the pause menu map.
+-- @param tile_names A table containing the names of the tiles to hide.
+local function export_hide_tiles(tile_names)
+    for _, tile_name in ipairs(tile_names) do
+        local tile = {
+            name = tostring(tile_name),
+        }
 
+        set_tile_alpha(scaleform_minimap_main_map_handle, tile, 0)
+        config.tiles[tile_name].alpha = 0
+    end
+
+    refresh_minimap()
+    extend_pause_menu_map_bounds()
 end
-
-
--- export function: shows all tiles on the pause menu map.
-local function export_show_all_tiles()
-
-end
-
-
--- export function: hides all tiles on the pause menu map.
-local function export_hide_all_tiles()
-
-end
-
 
 
 -- export function: checks if a specific tile is visible on the pause menu map.
@@ -211,9 +218,10 @@ local function export_is_tile_visible(tile_name)
         return false
     end
 
-    local alpha = tonumber(tile_config.alpha) or 0
+    local alpha = tonumber(tile_config.alpha)
     return alpha > 0
 end
+
 
 -- export function: refreshes the minimap to apply changes.
 local function export_refresh_minimap()
@@ -221,31 +229,32 @@ local function export_refresh_minimap()
 end
 
 
-
-exports("show_tile", export_show_tile)
-exports("hide_tile", export_hide_tile)
-exports("show_all_tiles", export_show_all_tiles)
-exports("hide_all_tiles", export_hide_all_tiles)
+exports("show_tiles", export_show_tiles)
+exports("hide_tiles", export_hide_tiles)
 exports("is_tile_visible", export_is_tile_visible)
 exports("refresh_minimap", export_refresh_minimap)
+
 
 Citizen.CreateThread(function()
     -- Set up alphas
     for _, tile_name in ipairs(get_keys(config.tiles)) do
-        if not config.tiles[tile_name].alpha then
+        if config.tiles[tile_name].visible == nil then
             config.tiles[tile_name].alpha = 100
+        else 
+            if config.tiles[tile_name].visible then
+                config.tiles[tile_name].alpha = 100
+            else
+                config.tiles[tile_name].alpha = 0
+            end
         end
     end
 
-    -- TODO: global scaleform handle to avoid reloading every time
-    -- TODO: rewrite export functions
-
     -- Load texture dictionaries and main map scaleform
     local loaded_texture_dictionaries = load_texture_dictionaries(config.tiles)
-    local scaleform_handle = load_scaleform(config.scaleform_minimap_main_map)
+    scaleform_minimap_main_map_handle = load_scaleform(config.scaleform_minimap_main_map)
 
     -- Clean any leftover textures in the main map scaleform
-    BeginScaleformMovieMethod(scaleform_handle, "CLEAR_TEXTURES")
+    BeginScaleformMovieMethod(scaleform_minimap_main_map_handle, "CLEAR_TEXTURES")
     EndScaleformMovieMethod()
 
     -- Set up general scaleform parameters
@@ -304,14 +313,14 @@ Citizen.CreateThread(function()
                 height = tile_size
             }
 
-            draw_tile(scaleform_handle, tile)
-            set_tile_alpha(scaleform_handle, tile, tile_config.alpha)
+            draw_tile(scaleform_minimap_main_map_handle, tile)
+            set_tile_alpha(scaleform_minimap_main_map_handle, tile, tile_config.alpha)
         end
     end
 
     -- Reset the scaleform handle (now pointing to minimap_main_map.gfx) to nil
-    scaleform_handle = SetScaleformMovieAsNoLongerNeeded(scaleform_handle)
-    scaleform_handle = nil
+    -- scaleform_handle = SetScaleformMovieAsNoLongerNeeded(scaleform_handle)
+    -- scaleform_handle = nil
 
     -- Fix minimap rendering on first load
     refresh_minimap()

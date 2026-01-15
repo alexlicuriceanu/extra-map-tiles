@@ -16,6 +16,7 @@ config.radar_masks = "radar_masks"
     - y_offset: The number of tiles away from the origin point on the Y axis
     - txd: The texture dictionary name for the tile
     - txn: The texture name for the tile
+    - visible (optional): Boolean value indicating whether the tile is visible by default. If omitted, the tile is visible by default.
     
     The mentioned origin point is the top left corner of the pause menu map (aka top left
     corner of minimap_sea_0_0), with everything else being in relation to it.
@@ -34,8 +35,8 @@ config.tiles = {
     [2] = {x_offset = 2, y_offset = 2, txd = "extra_tiles_blue", txn = "tile_2"},
 
     -- 4 example tiles in the north-west of the main map 
-    [3] = {x_offset = -1, y_offset = -1, txd = "extra_tiles_green_1", txn = "tile_3"},
-    [4] = {x_offset = 0, y_offset = -1, txd = "extra_tiles_green_1", txn = "tile_4", alpha = 0},
+    [3] = {x_offset = -1, y_offset = -1, txd = "extra_tiles_green_1", txn = "tile_3", visible = true},
+    [4] = {x_offset = 0, y_offset = -1, txd = "extra_tiles_green_1", txn = "tile_4", visible = false},
     [5] = {x_offset = -1, y_offset = 0, txd = "extra_tiles_green_2", txn = "tile_5"},
     [6] = {x_offset = -1, y_offset = 1, txd = "extra_tiles_green_2", txn = "tile_6"},
 }
