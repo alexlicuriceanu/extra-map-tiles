@@ -15,10 +15,6 @@ shared_scripts {
   "config.lua"
 }
 
-escrow_ignore {
-  "config.lua",
-}
-
 files {
   "stream/*.ytd",
   "stream/minimap_main_map.gfx"
