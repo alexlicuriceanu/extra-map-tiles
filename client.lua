@@ -159,6 +159,7 @@ local function draw_tile(scaleform_handle, tile)
     PushScaleformMovieFunctionParameterInt(tile.y_scale)
     PushScaleformMovieFunctionParameterFloat(tile.width)
     PushScaleformMovieFunctionParameterFloat(tile.height)
+    PushScaleformMovieFunctionParameterBool(tile.centered or false) -- The new boolean!
     EndScaleformMovieMethod()
 end
 
@@ -340,7 +341,8 @@ Citizen.CreateThread(function()
                 x_scale = x_scale,
                 y_scale = y_scale,
                 width = _width or tile_size,
-                height = _height or tile_size
+                height = _height or tile_size,
+                centered = tile_config.centered or false -- Read from your config
             }
 
             local rotation = tile_config.rotation or 0.0

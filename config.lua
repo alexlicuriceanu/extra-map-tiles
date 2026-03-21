@@ -37,6 +37,6 @@ config.tiles = {
     -- 4 example tiles in the north-west of the main map 
     [3] = {x_offset = -1, y_offset = -1, txd = "extra_tiles_green_1", txn = "tile_3", visible = true},
     [4] = {x_offset = 0, y_offset = -1, txd = "extra_tiles_green_1", txn = "tile_4", visible = false},
-    [5] = {x_offset = -1, y_offset = 0, txd = "extra_tiles_green_2", txn = "tile_5"},
+    [5] = {x_offset = 1, y_offset = 0, txd = "extra_tiles_green_2", txn = "tile_5", centered = true, rotation = 60.0, x_scale = 2.0, y_scale = 2.0},
     [6] = {x_offset = -1, y_offset = 1, txd = "extra_tiles_green_2", txn = "tile_6"},
 }
