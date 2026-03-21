@@ -309,6 +309,17 @@ Citizen.CreateThread(function()
                 y = y - (config.offset * (tile_config.y_offset or 0))
             end
 
+            local _width = nil
+            local _height = nil
+
+            if tile_config.x_scale then
+                _width = tile_size * tile_config.x_scale
+            end
+
+            if tile_config.y_scale then
+                _height = tile_size * tile_config.y_scale
+            end
+
             local tile = {
                 name = tostring(tile_name),
                 txd = tile_config.txd,
@@ -317,8 +328,8 @@ Citizen.CreateThread(function()
                 y = y,
                 x_scale = x_scale,
                 y_scale = y_scale,
-                width = tile_size,
-                height = tile_size
+                width = _width or tile_size,
+                height = _height or tile_size
             }
 
             draw_tile(scaleform_minimap_main_map_handle, tile)
