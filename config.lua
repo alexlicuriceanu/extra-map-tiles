@@ -31,8 +31,8 @@ config.radar_masks = "radar_masks"
 config.tiles = {
 
     -- 2 example tiles in the south-east of the main map
-    [1] = {x_offset = 2, y_offset = 1, txd = "extra_tiles_blue", txn = "tile_1", x_scale = 1.0, y_scale = 2.0},
-    [2] = {x_offset = 2, y_offset = 2, txd = "extra_tiles_blue", txn = "tile_2"},
+    [1] = {x_offset = 2, y_offset = 1, txd = "extra_tiles_blue", txn = "tile_1", x_scale = 2.0, y_scale = 2.0},
+    [2] = {x_offset = 2, y_offset = 2, txd = "extra_tiles_blue", txn = "tile_2", rotation = 90.0},
 
     -- 4 example tiles in the north-west of the main map 
     [3] = {x_offset = -1, y_offset = -1, txd = "extra_tiles_green_1", txn = "tile_3", visible = true},

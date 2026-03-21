@@ -172,7 +172,18 @@ local function set_tile_alpha(scaleform_handle, tile, alpha)
     PushScaleformMovieFunctionParameterString(tile.name) 
     PushScaleformMovieFunctionParameterInt(math.floor(alpha))
     EndScaleformMovieMethod()
-end 
+end
+
+-- sets the rotation of a tile.
+-- @param scaleform_handle The handle of the scaleform.
+-- @param tile_name The name (id) of the tile.
+-- @param rotation The rotation in degrees (0-360).
+local function set_tile_rotation(scaleform_handle, tile_name, rotation)
+    BeginScaleformMovieMethod(scaleform_handle, "SET_TILE_ROTATION")
+    PushScaleformMovieFunctionParameterString(tostring(tile_name)) 
+    PushScaleformMovieFunctionParameterFloat(tonumber(rotation) or 0.0)
+    EndScaleformMovieMethod()
+end
 
 
 -- export function: shows the specified tiles on the pause menu map.
@@ -332,8 +343,10 @@ Citizen.CreateThread(function()
                 height = _height or tile_size
             }
 
+            local rotation = tile_config.rotation or 0.0
             draw_tile(scaleform_minimap_main_map_handle, tile)
             set_tile_alpha(scaleform_minimap_main_map_handle, tile, tile_config.alpha)
+            set_tile_rotation(scaleform_minimap_main_map_handle, tile_name, rotation)
         end
     end
 
