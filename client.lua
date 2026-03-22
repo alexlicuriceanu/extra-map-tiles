@@ -278,7 +278,9 @@ Citizen.CreateThread(function()
     EndScaleformMovieMethod()
 
     -- Set up general scaleform parameters
-    local x_scale = 100
+
+    -- START DO NOT MODIFY
+    local x_scale = 100 
     local y_scale = 100
     local x_origin = 864.0
     local y_origin = 1440.0
@@ -302,6 +304,7 @@ Citizen.CreateThread(function()
 
     x_origin = x_origin - tile_size
     y_origin = y_origin - 2 * tile_size
+    -- END DO NOT MODIFY
 
     -- Draw the extra tiles
     for _, tile_name in ipairs(get_keys(config.tiles)) do

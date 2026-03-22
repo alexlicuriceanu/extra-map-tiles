@@ -21,13 +21,13 @@ config.tiles = {
     ['2'] = {
         txd = "extra_tiles_blue",
         txn = "tile_2",
-        x = -4140.0,
-        y = -1.0,
+        x = 0.0,
+        y = 0.0,
         x_scale = 1.0,
         y_scale = 1.0,
         rotation = 0.0,
         alpha = 100,
-        centered = false
+        centered = true
     },
     ['4'] = {
         txd = "extra_tiles_green_1",
