@@ -159,7 +159,9 @@ local function draw_tile(scaleform_handle, tile)
     PushScaleformMovieFunctionParameterInt(tile.y_scale)
     PushScaleformMovieFunctionParameterFloat(tile.width)
     PushScaleformMovieFunctionParameterFloat(tile.height)
-    PushScaleformMovieFunctionParameterBool(tile.centered or false) -- The new boolean!
+    PushScaleformMovieFunctionParameterBool(tile.centered or false)
+    PushScaleformMovieFunctionParameterInt(math.floor(tile.alpha or 100))
+    PushScaleformMovieFunctionParameterFloat(tonumber(tile.rotation) or 0.0)
     EndScaleformMovieMethod()
 end
 
@@ -258,13 +260,18 @@ exports("refresh_minimap", export_refresh_minimap)
 Citizen.CreateThread(function()
     -- Set up alphas
     for _, tile_name in ipairs(get_keys(config.tiles)) do
-        if config.tiles[tile_name].visible == nil then
-            config.tiles[tile_name].alpha = 100
-        else 
-            if config.tiles[tile_name].visible then
-                config.tiles[tile_name].alpha = 100
-            else
-                config.tiles[tile_name].alpha = 0
+        local tile_config = config.tiles[tile_name]
+        
+        -- Only calculate alpha based on 'visible' if the user didn't explicitly set an alpha
+        if tile_config.alpha == nil then
+            if tile_config.visible == nil then
+                tile_config.alpha = 100
+            else 
+                if tile_config.visible then
+                    tile_config.alpha = 100
+                else
+                    tile_config.alpha = 0
+                end
             end
         end
     end
@@ -361,13 +368,13 @@ Citizen.CreateThread(function()
                 y_scale = y_scale,
                 width = _width or tile_size,
                 height = _height or tile_size,
-                centered = tile_config.centered or false -- Read from your config
+                centered = tile_config.centered or false,
+                alpha = tile_config.alpha or 100,
+                rotation = tile_config.rotation or 0.0,
             }
 
             local rotation = tile_config.rotation or 0.0
             draw_tile(scaleform_minimap_main_map_handle, tile)
-            set_tile_alpha(scaleform_minimap_main_map_handle, tile, tile_config.alpha)
-            set_tile_rotation(scaleform_minimap_main_map_handle, tile_name, rotation)
         end
     end
 
