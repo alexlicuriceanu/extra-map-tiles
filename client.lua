@@ -293,6 +293,9 @@ Citizen.CreateThread(function()
     local x_offset = 360 / scale_factor
     local y_offset = 600 / scale_factor
 
+    x_origin_game = x_origin
+    y_origin_game = y_origin
+
     x_origin = x_origin + x_offset
     y_origin = y_origin + y_offset
     local tile_size = vBitmapTileSizeX / scale_factor
@@ -308,17 +311,30 @@ Citizen.CreateThread(function()
             local x = x_origin + (tile_config.x_offset or 0) * tile_size
             local y = y_origin + (tile_config.y_offset or 0) * tile_size
 
-            if tile_config.x_offset > 0 then
-                x = x - (config.offset * (tile_config.x_offset or 0))
-            elseif tile_config.x_offset < 0 then
-                --x = x - (2 * config.offset * (tile_config.x_offset or 0))
-                x = x - (config.offset * (tile_config.x_offset or 0))
+            print(x_origin, y_origin)
+            if tile_config.x then
+                x = x_origin_game + tile_config.x / scale_factor
             end
 
-            if tile_config.y_offset > 0 then
-                y = y - (config.offset * (tile_config.y_offset or 0))
-            elseif tile_config.y_offset < 0 then
-                y = y - (config.offset * (tile_config.y_offset or 0))
+            if tile_config.y then
+                y = y_origin_game - tile_config.y / scale_factor
+            end
+
+            if tile_config.x_offset then
+                if tile_config.x_offset > 0 then
+                    x = x - (config.offset * (tile_config.x_offset or 0))
+                elseif tile_config.x_offset < 0 then
+                    --x = x - (2 * config.offset * (tile_config.x_offset or 0))
+                    x = x - (config.offset * (tile_config.x_offset or 0))
+                end
+            end
+
+            if tile_config.y_offset then
+                if tile_config.y_offset > 0 then
+                    y = y - (config.offset * (tile_config.y_offset or 0))
+                elseif tile_config.y_offset < 0 then
+                    y = y - (config.offset * (tile_config.y_offset or 0))
+                end
             end
 
             local _width = nil
