@@ -4,6 +4,7 @@ local vBitmapTileSizeY = 4500.0
 local vBitmapStartX = -4140.0
 local vBitmapStartY = 8400.0
 
+
 -- global variables
 local dummy_blips = {}
 local scaleform_minimap_main_map_handle = nil
@@ -144,51 +145,6 @@ local function extend_pause_menu_map_bounds()
 end
 
 
-
--- creates a tile based on the provided configuration.
--- @param scaleform_handle The handle of the scaleform to draw the tile on.
--- @param tile The configuration table for the tile.
-local function draw_tile(scaleform_handle, tile)
-    BeginScaleformMovieMethod(scaleform_handle, "DRAW_TEXTURE")
-    PushScaleformMovieFunctionParameterString(tile.name) 
-    PushScaleformMovieFunctionParameterString(tile.txd) 
-    PushScaleformMovieFunctionParameterString(tile.txn)
-    PushScaleformMovieFunctionParameterFloat(tile.x)
-    PushScaleformMovieFunctionParameterFloat(tile.y)
-    PushScaleformMovieFunctionParameterInt(tile.x_scale)
-    PushScaleformMovieFunctionParameterInt(tile.y_scale)
-    PushScaleformMovieFunctionParameterFloat(tile.width)
-    PushScaleformMovieFunctionParameterFloat(tile.height)
-    PushScaleformMovieFunctionParameterBool(tile.centered or false)
-    PushScaleformMovieFunctionParameterInt(math.floor(tile.alpha or 100))
-    PushScaleformMovieFunctionParameterFloat(tonumber(tile.rotation) or 0.0)
-    EndScaleformMovieMethod()
-end
-
-
--- sets the alpha value of a tile.
--- @param scaleform_handle The handle of the scaleform to set the tile alpha on.
--- @param tile The configuration table for the tile.
--- @param alpha The alpha value to set for the tile (0-100).
-local function set_tile_alpha(scaleform_handle, tile, alpha)
-    BeginScaleformMovieMethod(scaleform_handle, "SET_TILE_ALPHA")
-    PushScaleformMovieFunctionParameterString(tile.name) 
-    PushScaleformMovieFunctionParameterInt(math.floor(alpha))
-    EndScaleformMovieMethod()
-end
-
--- sets the rotation of a tile.
--- @param scaleform_handle The handle of the scaleform.
--- @param tile_name The name (id) of the tile.
--- @param rotation The rotation in degrees (0-360).
-local function set_tile_rotation(scaleform_handle, tile_name, rotation)
-    BeginScaleformMovieMethod(scaleform_handle, "SET_TILE_ROTATION")
-    PushScaleformMovieFunctionParameterString(tostring(tile_name)) 
-    PushScaleformMovieFunctionParameterFloat(tonumber(rotation) or 0.0)
-    EndScaleformMovieMethod()
-end
-
-
 -- export function: shows the specified tiles on the pause menu map.
 -- @param tile_names A table containing the names of the tiles to show.
 local function export_show_tiles(tile_names)
@@ -307,7 +263,7 @@ Citizen.CreateThread(function()
 
     x_origin = x_origin + x_offset
     y_origin = y_origin + y_offset
-    local tile_size = vBitmapTileSizeX / scale_factor
+    tile_size = vBitmapTileSizeX / scale_factor
 
     x_origin = x_origin - tile_size
     y_origin = y_origin - 2 * tile_size
@@ -347,15 +303,15 @@ Citizen.CreateThread(function()
                 end
             end
 
-            local _width = nil
-            local _height = nil
+            local x_scale = tile_size
+            local y_scale = tile_size
 
             if tile_config.x_scale then
-                _width = tile_size * tile_config.x_scale
+                x_scale = tile_size * tile_config.x_scale
             end
 
             if tile_config.y_scale then
-                _height = tile_size * tile_config.y_scale
+                y_scale = tile_size * tile_config.y_scale
             end
 
             local tile = {
@@ -364,10 +320,8 @@ Citizen.CreateThread(function()
                 txn = tile_config.txn,
                 x = x,
                 y = y,
-                x_scale = x_scale,
-                y_scale = y_scale,
-                width = _width or tile_size,
-                height = _height or tile_size,
+                width = x_scale or tile_size,
+                height = y_scale or tile_size,
                 centered = tile_config.centered or false,
                 alpha = tile_config.alpha or 100,
                 rotation = tile_config.rotation or 0.0,
@@ -394,6 +348,18 @@ Citizen.CreateThread(function()
 
     -- Extend the pause menu map bounds by creating dummy blips
     extend_pause_menu_map_bounds()
+
+
+    test_tile = {
+        name = "2",
+        width = tile_size * 1.5,
+        height = tile_size * 2.5,
+        alpha = 30,
+        rotation = 45.0,
+    }
+    set_tile_scale(scaleform_minimap_main_map_handle, test_tile)
+    set_tile_rotation(scaleform_minimap_main_map_handle, test_tile)
+    set_tile_alpha(scaleform_minimap_main_map_handle, test_tile)
 
     if config.remove_blur then
         RequestStreamedTextureDict(config.radar_masks)
