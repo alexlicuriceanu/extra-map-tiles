@@ -133,7 +133,7 @@ Citizen.CreateThread(function()
         config.tiles[tile_name].alpha = math.floor(tonumber(tile_config.alpha) or 100)
         config.tiles[tile_name].rotation = tile_config.rotation or 0.0
         config.tiles[tile_name].centered = tile_config.centered or false
-        config.tiles[tile_name].visible = tile_config.visible or true
+        config.tiles[tile_name].visible = tile_config.visible and config.tiles[tile_name].alpha > 0
     end
 
 
@@ -203,6 +203,7 @@ Citizen.CreateThread(function()
             -- Calculate the final width and height of the tile on the scaleform, using the scale factors
             local scaleform_width = tile_size * (math.abs(tile_config.x_scale) or 1.0)
             local scaleform_height = tile_size * (math.abs(tile_config.y_scale) or 1.0)
+            local draw_alpha = tile_config.visible == false and 0 or (tile_config.alpha or 100)
 
             local tile = {
                 name = tostring(tile_name),
@@ -213,7 +214,7 @@ Citizen.CreateThread(function()
                 width = scaleform_width,
                 height = scaleform_height,
                 centered = tile_config.centered or false,
-                alpha = tile_config.alpha or 100,
+                alpha = draw_alpha,
                 rotation = 1.0 * (tile_config.rotation or 0.0),
             }
 
