@@ -222,6 +222,10 @@ Citizen.CreateThread(function()
     -- scaleform_handle = SetScaleformMovieAsNoLongerNeeded(scaleform_handle)
     -- scaleform_handle = nil
 
+    while not IsMinimapRendering() do
+        Citizen.Wait(0)
+    end
+    
     -- Fix minimap rendering on first load
     refresh_minimap()
 

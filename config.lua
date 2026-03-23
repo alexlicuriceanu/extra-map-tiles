@@ -27,7 +27,7 @@ config.tiles = {
         y_scale = 1.0,
         alpha = 100,
         rotation = 0.0,
-        centered = false,
+        centered = true,
     },
     ['3'] = {
         txd = "extra_tiles_blue",
