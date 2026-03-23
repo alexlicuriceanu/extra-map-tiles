@@ -8,7 +8,7 @@ function export_show_tiles(tile_names)
     for _, tile_name in ipairs(tile_names) do
         local tile = {
             name = tostring(tile_name),
-            alpha = 100,
+            alpha = config.tiles[tile_name] and config.tiles[tile_name].alpha or 100,
         }
 
         set_tile_alpha(scaleform_minimap_main_map_handle, tile)
@@ -29,7 +29,7 @@ function export_hide_tiles(tile_names)
     for _, tile_name in ipairs(tile_names) do
         local tile = {
             name = tostring(tile_name),
-            alpha = 0
+            alpha = 0,
         }
 
         set_tile_alpha(scaleform_minimap_main_map_handle, tile)
@@ -83,6 +83,8 @@ function export_set_tile_rotation(tile_name, rotation)
 
     set_tile_rotation(scaleform_minimap_main_map_handle, tile)
     config.tiles[tile_name].rotation = tile.rotation
+
+    extend_pause_menu_map_bounds()
 end
 
 -- export function: sets the alpha (opacity) of a specific tile on the pause menu map.
@@ -104,6 +106,8 @@ function export_set_tile_alpha(tile_name, alpha)
     set_tile_alpha(scaleform_minimap_main_map_handle, tile)
     config.tiles[tile_name].alpha = _alpha
     config.tiles[tile_name].visible = _alpha > 0
+
+    extend_pause_menu_map_bounds()
 end
 
 -- export function: sets the scale of a specific tile on the pause menu map.
@@ -124,6 +128,8 @@ function export_set_tile_scale(tile_name, x_scale, y_scale)
     set_tile_scale(scaleform_minimap_main_map_handle, tile)
     config.tiles[tile_name].x_scale = 1.0 * tonumber(x_scale)
     config.tiles[tile_name].y_scale = 1.0 * tonumber(y_scale)
+
+    extend_pause_menu_map_bounds()
 end
 
 -- export function: gets the rotation of a specific tile from the configuration.
@@ -163,7 +169,10 @@ function export_get_tile_scale(tile_name)
     return 1.0 * tonumber(tile_config.x_scale) or 1.0, 1.0 * tonumber(tile_config.y_scale) or 1.0
 end
 
-function is_tile_centered(tile_name)
+-- export function: checks if a specific tile is configured to be centered on the pause menu map.
+-- @param tile_name The name of the tile to check.
+-- @return true if the tile is configured to be centered, false otherwise.
+function export_is_tile_centered(tile_name)
     local tile_config = config.tiles[tile_name]
     if not tile_config then
         return false
@@ -172,16 +181,22 @@ function is_tile_centered(tile_name)
     return tile_config.centered == true
 end
 
+-- export function: extends the bounds of the pause menu map.
+function export_extend_pause_menu_map_bounds()
+    extend_pause_menu_map_bounds()
+end
 
-exports("show_tiles", export_show_tiles)    --ok
-exports("hide_tiles", export_hide_tiles)    --ok
-exports("is_tile_visible", export_is_tile_visible)  --ok
-exports("refresh_minimap", export_refresh_minimap)  --ok
-exports("get_tile_names", export_get_tile_names)    --ok
-exports("set_tile_rotation", export_set_tile_rotation)  --ok
-exports("set_tile_alpha", export_set_tile_alpha)    --ok
+
+exports("show_tiles", export_show_tiles)
+exports("hide_tiles", export_hide_tiles)
+exports("is_tile_visible", export_is_tile_visible)
+exports("refresh_minimap", export_refresh_minimap)
+exports("get_tile_names", export_get_tile_names)
+exports("set_tile_rotation", export_set_tile_rotation)
+exports("set_tile_alpha", export_set_tile_alpha)
 exports("set_tile_scale", export_set_tile_scale)
-exports("get_tile_rotation", export_get_tile_rotation)  --ok
-exports("get_tile_alpha", export_get_tile_alpha)    -- ok
-exports("get_tile_scale", export_get_tile_scale)    -- ok 
-exports("is_tile_centered", is_tile_centered)   -- ok
+exports("get_tile_rotation", export_get_tile_rotation)
+exports("get_tile_alpha", export_get_tile_alpha)
+exports("get_tile_scale", export_get_tile_scale)
+exports("is_tile_centered", export_is_tile_centered)
+exports("extend_pause_menu_map_bounds", export_extend_pause_menu_map_bounds)

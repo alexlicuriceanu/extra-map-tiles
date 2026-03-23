@@ -23,55 +23,103 @@ end
 -- "hack" the pause menu map bounds by creating dummy blips
 -- at the corners of the furthest tiles.
 function extend_pause_menu_map_bounds()
-    -- for _, blip in ipairs(dummy_blips) do
-    --     RemoveBlip(blip)
-    -- end
-    -- dummy_blips = {}
+    -- Clean up existing blips
+    for _, blip in ipairs(dummy_blips) do
+        RemoveBlip(blip)
+    end
+    dummy_blips = {}
     
-    -- local keys = get_keys(config.tiles)
-    -- if #keys == 0 then
-    --     return
-    -- end
+    local keys = get_keys(config.tiles)
+    if #keys == 0 then
+        return
+    end
 
-    -- local x_min_offset = 1e5
-    -- local x_max_offset = -1e5
-    -- local y_min_offset = 1e5
-    -- local y_max_offset = -1e5
-    -- local found = false
+    -- Use infinity to track absolute min/max
+    local global_x_min = math.huge
+    local global_x_max = -math.huge
+    local global_y_min = math.huge
+    local global_y_max = -math.huge
+    local found = false
 
-    -- for i = 1, #keys do
-    --     local tile = config.tiles[keys[i]]
-    --     local alpha = tonumber(tile.alpha)
+    local scale_factor = 9216 / 1728.0
 
-    --     if alpha <= 0 then
-    --         goto continue
-    --     end
+    for i = 1, #keys do
+        local tile_config = config.tiles[keys[i]]
+        local alpha = tonumber(tile_config.alpha) or 100
 
-    --     if tile.x_offset then
-    --         x_min_offset = math.min(x_min_offset, tile.x_offset)
-    --         x_max_offset = math.max(x_max_offset, tile.x_offset)
-    --     end
+        -- Skip hidden tiles
+        if tile_config.visible == false or alpha <= 0 then
+            goto continue
+        end
 
-    --     if tile.y_offset then
-    --         y_min_offset = math.min(y_min_offset, tile.y_offset)
-    --         y_max_offset = math.max(y_max_offset, tile.y_offset)
-    --     end
+        -- Determine origin: top left or center depending on config
+        local origin_x = vBitmapStartX + (tile_config.x_offset or 0) * vBitmapTileSizeX
+        local origin_y = vBitmapStartY - (tile_config.y_offset or 0) * vBitmapTileSizeY
 
-    --     found = true
-    --     ::continue::
-    -- end
+        -- Override with explicit game coordinates if provided
+        if tile_config.x then
+            origin_x = tile_config.x
+        end
+        if tile_config.y then
+            origin_y = tile_config.y
+        end
 
-    -- if not found then
-    --     return
-    -- end
+        -- Dimensions
+        local width = vBitmapTileSizeX * math.abs(tonumber(tile_config.x_scale) or 1.0)
+        local height = vBitmapTileSizeY * math.abs(tonumber(tile_config.y_scale) or 1.0)
 
-    -- local x_min = vBitmapStartX + x_min_offset * vBitmapTileSizeX
-    -- local x_max = vBitmapStartX + x_max_offset * vBitmapTileSizeX + vBitmapTileSizeX
-    -- local y_min = vBitmapStartY - y_min_offset * vBitmapTileSizeY
-    -- local y_max = vBitmapStartY - y_max_offset * vBitmapTileSizeY - vBitmapTileSizeY
+        -- Unrotated corners in local tile space
+        local corners = {}
+        if tile_config.centered then
+            -- Origin is center
+            corners = {
+                { x = -width / 2, y = height / 2 }, -- Top left
+                { x = width / 2, y = height / 2 },  -- Top right
+                { x = -width / 2, y = -height / 2 },    -- Bottom left
+                { x = width / 2, y = -height / 2 }  -- Bottom right
+            }
+        else
+            -- Origin is top left
+            corners = {
+                { x = 0, y = 0 },   -- Top left
+                { x = width, y = 0 },   -- Top right
+                { x = 0, y = -height },  -- Bottom left
+                { x = width, y = -height }  -- Bottom right
+            }
+        end
 
-    -- table.insert(dummy_blips, create_dummy_blip(x_min, y_min))
-    -- table.insert(dummy_blips, create_dummy_blip(x_max, y_max))
+        -- Rotate and translate to world space
+        local rad = math.rad(-(tile_config.rotation or 0.0))
+        local cos_theta = math.cos(rad)
+        local sin_theta = math.sin(rad)
+
+        for _, corner in ipairs(corners) do
+            -- Apply the rotation matrix
+            local rot_x = corner.x * cos_theta - corner.y * sin_theta
+            local rot_y = corner.x * sin_theta + corner.y * cos_theta
+
+            -- Translate to game world coordinates
+            local world_x = origin_x + rot_x
+            local world_y = origin_y + rot_y
+
+            -- Expand the global bounding box
+            global_x_min = math.min(global_x_min, world_x)
+            global_x_max = math.max(global_x_max, world_x)
+            global_y_min = math.min(global_y_min, world_y)
+            global_y_max = math.max(global_y_max, world_y)
+        end
+
+        found = true
+        ::continue::
+    end
+
+    if not found then
+        return
+    end
+
+    -- Bounding box can be defined just by 2 corners
+    table.insert(dummy_blips, create_dummy_blip(global_x_min, global_y_min))
+    table.insert(dummy_blips, create_dummy_blip(global_x_max, global_y_max))
 end
 
 
