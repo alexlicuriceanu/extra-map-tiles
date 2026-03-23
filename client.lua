@@ -132,7 +132,7 @@ Citizen.CreateThread(function()
             local x = x_origin + (tile_config.x_offset or 0) * tile_size
             local y = y_origin + (tile_config.y_offset or 0) * tile_size
 
-            print(x_origin, y_origin)
+            -- Convert tile XY from game units to scaleform units
             if tile_config.x then
                 x = x_origin_game + tile_config.x / scale_factor
             end
@@ -141,21 +141,13 @@ Citizen.CreateThread(function()
                 y = y_origin_game - tile_config.y / scale_factor
             end
 
+            -- Apply small offset to overlap tiles and prevent gaps
             if tile_config.x_offset then
-                if tile_config.x_offset > 0 then
-                    x = x - (config.offset * (tile_config.x_offset or 0))
-                elseif tile_config.x_offset < 0 then
-                    --x = x - (2 * config.offset * (tile_config.x_offset or 0))
-                    x = x - (config.offset * (tile_config.x_offset or 0))
-                end
+                x = x - (config.offset * tile_config.x_offset)
             end
-
+            
             if tile_config.y_offset then
-                if tile_config.y_offset > 0 then
-                    y = y - (config.offset * (tile_config.y_offset or 0))
-                elseif tile_config.y_offset < 0 then
-                    y = y - (config.offset * (tile_config.y_offset or 0))
-                end
+                y = y - (config.offset * (tile_config.y_offset or 0))
             end
 
             local x_scale = tile_size

@@ -51,7 +51,7 @@ function load_scaleform(scaleform_name)
 end
 
 -- refreshes the minimap by loading the minimap.gfx scaleform.
-local function refresh_minimap()
+function refresh_minimap()
     -- Load the minimap.gfx scaleform to fix minimap rendering on first load
     scaleform_minimap_handle = load_scaleform(config.scaleform_minimap)
     SetBigmapActive(true, false)
