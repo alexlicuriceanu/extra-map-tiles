@@ -182,7 +182,6 @@ Citizen.CreateThread(function()
                 rotation = tile_config.rotation or 0.0,
             }
 
-            local rotation = tile_config.rotation or 0.0
             draw_tile(scaleform_minimap_main_map_handle, tile)
         end
     end
@@ -203,18 +202,6 @@ Citizen.CreateThread(function()
 
     -- Extend the pause menu map bounds by creating dummy blips
     extend_pause_menu_map_bounds()
-
-
-    test_tile = {
-        name = "2",
-        width = tile_size * 1.5,
-        height = tile_size * 2.5,
-        alpha = 30,
-        rotation = 45.0,
-    }
-    set_tile_scale(scaleform_minimap_main_map_handle, test_tile)
-    set_tile_rotation(scaleform_minimap_main_map_handle, test_tile)
-    set_tile_alpha(scaleform_minimap_main_map_handle, test_tile)
 
     if config.remove_blur then
         RequestStreamedTextureDict(config.radar_masks)
