@@ -10,10 +10,10 @@ config.tiles = {
     ['1'] = {
         txd = "extra_tiles_blue",
         txn = "tile_1",
-        x = 0.0,
-        y = 0.0,
-        x_scale = 1.0,
-        y_scale = 1.0,
+        x_offset = 0.0,
+        y_offset = 0.0,
+        x_scale = 2.0,
+        y_scale = 2.0,
         alpha = 100,
         rotation = 0.0,
         centered = false,
@@ -21,12 +21,12 @@ config.tiles = {
     ['2'] = {
         txd = "extra_tiles_blue",
         txn = "tile_2",
-        x = 4500.0,
-        y = 0.0,
+        x_offset = 1.0,
+        y_offset = 0.0,
         x_scale = 1.0,
         y_scale = 1.0,
         alpha = 100,
         rotation = 0.0,
         centered = false,
-    },
+    }
 }
