@@ -158,6 +158,15 @@ function export_get_tile_scale(tile_name)
     return tonumber(tile_config.x_scale) or 1.0, tonumber(tile_config.y_scale) or 1.0
 end
 
+function is_tile_centered(tile_name)
+    local tile_config = config.tiles[tile_name]
+    if not tile_config then
+        return false
+    end
+
+    return tile_config.centered == true
+end
+
 exports("show_tiles", export_show_tiles)
 exports("hide_tiles", export_hide_tiles)
 exports("is_tile_visible", export_is_tile_visible)
@@ -169,3 +178,4 @@ exports("set_tile_scale", export_set_tile_scale)
 exports("get_tile_rotation", export_get_tile_rotation)
 exports("get_tile_alpha", export_get_tile_alpha)
 exports("get_tile_scale", export_get_tile_scale)
+exports("is_tile_centered", is_tile_centered)
