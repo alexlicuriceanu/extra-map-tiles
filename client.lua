@@ -23,75 +23,70 @@ end
 -- "hack" the pause menu map bounds by creating dummy blips
 -- at the corners of the furthest tiles.
 local function extend_pause_menu_map_bounds()
-    for _, blip in ipairs(dummy_blips) do
-        RemoveBlip(blip)
-    end
-    dummy_blips = {}
+    -- for _, blip in ipairs(dummy_blips) do
+    --     RemoveBlip(blip)
+    -- end
+    -- dummy_blips = {}
     
-    local keys = get_keys(config.tiles)
-    if #keys == 0 then
-        return
-    end
+    -- local keys = get_keys(config.tiles)
+    -- if #keys == 0 then
+    --     return
+    -- end
 
-    local x_min_offset = 1e5
-    local x_max_offset = -1e5
-    local y_min_offset = 1e5
-    local y_max_offset = -1e5
-    local found = false
+    -- local x_min_offset = 1e5
+    -- local x_max_offset = -1e5
+    -- local y_min_offset = 1e5
+    -- local y_max_offset = -1e5
+    -- local found = false
 
-    for i = 1, #keys do
-        local tile = config.tiles[keys[i]]
-        local alpha = tonumber(tile.alpha)
+    -- for i = 1, #keys do
+    --     local tile = config.tiles[keys[i]]
+    --     local alpha = tonumber(tile.alpha)
 
-        if alpha <= 0 then
-            goto continue
-        end
+    --     if alpha <= 0 then
+    --         goto continue
+    --     end
 
-        if tile.x_offset then
-            x_min_offset = math.min(x_min_offset, tile.x_offset)
-            x_max_offset = math.max(x_max_offset, tile.x_offset)
-        end
+    --     if tile.x_offset then
+    --         x_min_offset = math.min(x_min_offset, tile.x_offset)
+    --         x_max_offset = math.max(x_max_offset, tile.x_offset)
+    --     end
 
-        if tile.y_offset then
-            y_min_offset = math.min(y_min_offset, tile.y_offset)
-            y_max_offset = math.max(y_max_offset, tile.y_offset)
-        end
+    --     if tile.y_offset then
+    --         y_min_offset = math.min(y_min_offset, tile.y_offset)
+    --         y_max_offset = math.max(y_max_offset, tile.y_offset)
+    --     end
 
-        found = true
-        ::continue::
-    end
+    --     found = true
+    --     ::continue::
+    -- end
 
-    if not found then
-        return
-    end
+    -- if not found then
+    --     return
+    -- end
 
-    local x_min = vBitmapStartX + x_min_offset * vBitmapTileSizeX
-    local x_max = vBitmapStartX + x_max_offset * vBitmapTileSizeX + vBitmapTileSizeX
-    local y_min = vBitmapStartY - y_min_offset * vBitmapTileSizeY
-    local y_max = vBitmapStartY - y_max_offset * vBitmapTileSizeY - vBitmapTileSizeY
+    -- local x_min = vBitmapStartX + x_min_offset * vBitmapTileSizeX
+    -- local x_max = vBitmapStartX + x_max_offset * vBitmapTileSizeX + vBitmapTileSizeX
+    -- local y_min = vBitmapStartY - y_min_offset * vBitmapTileSizeY
+    -- local y_max = vBitmapStartY - y_max_offset * vBitmapTileSizeY - vBitmapTileSizeY
 
-    table.insert(dummy_blips, create_dummy_blip(x_min, y_min))
-    table.insert(dummy_blips, create_dummy_blip(x_max, y_max))
+    -- table.insert(dummy_blips, create_dummy_blip(x_min, y_min))
+    -- table.insert(dummy_blips, create_dummy_blip(x_max, y_max))
 end
 
 Citizen.CreateThread(function()
-    -- Set up alphas
-    for _, tile_name in ipairs(get_keys(config.tiles)) do
-        local tile_config = config.tiles[tile_name]
-        
-        -- Only calculate alpha based on 'visible' if the user didn't explicitly set an alpha
-        if tile_config.alpha == nil then
-            if tile_config.visible == nil then
-                tile_config.alpha = 100
-            else 
-                if tile_config.visible then
-                    tile_config.alpha = 100
-                else
-                    tile_config.alpha = 0
-                end
-            end
-        end
+    -- Set up fields for each tile in the configuration
+    for tile_name, tile_config in pairs(config.tiles) do
+        config.tiles[tile_name].x_offset = tile_config.x_offset or 0
+        config.tiles[tile_name].y_offset = tile_config.y_offset or 0
+        config.tiles[tile_name].x_scale = tile_config.x_scale or 1.0
+        config.tiles[tile_name].y_scale = tile_config.y_scale or 1.0
+        config.tiles[tile_name].alpha = tile_config.alpha or 100
+        config.tiles[tile_name].rotation = tile_config.rotation or 0.0
+        config.tiles[tile_name].centered = tile_config.centered or false
+        config.tiles[tile_name].visible = tile_config.visible or true
     end
+
 
     -- Load texture dictionaries and main map scaleform
     local loaded_texture_dictionaries = load_texture_dictionaries(config.tiles)
@@ -102,8 +97,7 @@ Citizen.CreateThread(function()
     EndScaleformMovieMethod()
 
     -- Set up general scaleform parameters
-
-    -- START DO NOT MODIFY
+    -- DO NOT MODIFY
     local x_scale = 100 
     local y_scale = 100
     local x_origin = 864.0
