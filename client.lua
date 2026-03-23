@@ -177,10 +177,12 @@ Citizen.CreateThread(function()
         local tile_config = config.tiles[tile_name]
         
         if tile_config then
+
+            -- Compute position based on offsets
             local scaleform_x = scaleform_x_origin + (tile_config.x_offset or 0) * tile_size
             local scaleform_y = scaleform_y_origin + (tile_config.y_offset or 0) * tile_size
 
-            -- Convert tile XY from game units to scaleform units
+            -- Convert tile XY from game units to scaleform units if in XY mode
             if tile_config.x then
                 scaleform_x = scaleform_x_origin_game + tile_config.x / scale_factor
             end
@@ -198,6 +200,7 @@ Citizen.CreateThread(function()
                 scaleform_y = scaleform_y - (config.offset * (tile_config.y_offset or 0))
             end
 
+            -- Calculate the final width and height of the tile on the scaleform, using the scale factors
             local scaleform_width = tile_size * (math.abs(tile_config.x_scale) or 1.0)
             local scaleform_height = tile_size * (math.abs(tile_config.y_scale) or 1.0)
 
@@ -222,10 +225,11 @@ Citizen.CreateThread(function()
     -- scaleform_handle = SetScaleformMovieAsNoLongerNeeded(scaleform_handle)
     -- scaleform_handle = nil
 
+    -- Wait for the minimap to render before doing anything else
     while not IsMinimapRendering() do
         Citizen.Wait(0)
     end
-    
+
     -- Fix minimap rendering on first load
     refresh_minimap()
 
