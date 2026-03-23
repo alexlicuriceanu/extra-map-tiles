@@ -4,78 +4,9 @@ local vBitmapTileSizeY = 4500.0
 local vBitmapStartX = -4140.0
 local vBitmapStartY = 8400.0
 
-
 -- global variables
 local dummy_blips = {}
 local scaleform_minimap_main_map_handle = nil
-
--- get the keys of a table.
--- @param t The table to get the keys from.
--- @return keys A sorted table containing the keys of the input table.
-local function get_keys(t)
-  local keys = {}
-
-  for key, _ in pairs(t) do
-    table.insert(keys, key)
-  end
-
-  table.sort(keys)
-  return keys
-end
-
-
--- loads the texture dictionaries specified in the configuration file.
--- @param texture_dictionaries Table containing the tiles configuration.
--- @return loaded_texture_dictionaries A table containing the names loaded texture dictionaries.
-local function load_texture_dictionaries(texture_dictionaries)
-    local loaded_texture_dictionaries = {}
-
-    print("Requesting texture dictionaries")
-
-    for _, tile in pairs(texture_dictionaries) do
-        if tile.txd then
-            RequestStreamedTextureDict(tile.txd)
-            while not HasStreamedTextureDictLoaded(tile.txd) do
-                Citizen.Wait(0)
-            end
-
-            table.insert(loaded_texture_dictionaries, tile.txd)
-        end
-    end
-
-    print("Texture dictionaries loaded successfully")
-    return loaded_texture_dictionaries
-end
-
-
--- requests and loads a scaleform file.
--- @param scaleform_name The name of the scaleform file to load.
--- @return scaleform_handle The handle of the loaded scaleform.
-local function load_scaleform(scaleform_name)
-    print("Requesting " .. scaleform_name .. " scaleform")
-
-    local scaleform_handle = RequestScaleformMovie(scaleform_name)
-    while not HasScaleformMovieLoaded(scaleform_handle) do
-        Citizen.Wait(0)
-    end
-
-    print("Scaleform " .. scaleform_name .. " loaded successfully")
-    return scaleform_handle
-end
-
--- refreshes the minimap by loading the minimap.gfx scaleform.
-local function refresh_minimap()
-    -- Load the minimap.gfx scaleform to fix minimap rendering on first load
-    scaleform_minimap_handle = load_scaleform(config.scaleform_minimap)
-    SetBigmapActive(true, false)
-    Citizen.Wait(0)
-    SetBigmapActive(false, false)
-
-    -- Reset the scaleform handle (now pointing to minimap.gfx) to nil
-    scaleform_minimap_handle = SetScaleformMovieAsNoLongerNeeded(scaleform_minimap_handle)
-    scaleform_minimap_handle = nil
-end
-
 
 -- create an invisible blip at the specified coordinates.
 -- @param x The x coordinate of the blip.
@@ -88,7 +19,6 @@ local function create_dummy_blip(x, y)
 
     return dummy_blip
 end
-
 
 -- "hack" the pause menu map bounds by creating dummy blips
 -- at the corners of the furthest tiles.
@@ -143,75 +73,6 @@ local function extend_pause_menu_map_bounds()
     table.insert(dummy_blips, create_dummy_blip(x_min, y_min))
     table.insert(dummy_blips, create_dummy_blip(x_max, y_max))
 end
-
-
--- export function: shows the specified tiles on the pause menu map.
--- @param tile_names A table containing the names of the tiles to show.
-local function export_show_tiles(tile_names)
-    if tile_names == nil then
-        return
-    end
-
-    for _, tile_name in ipairs(tile_names) do
-        local tile = {
-            name = tostring(tile_name),
-        }
-
-        set_tile_alpha(scaleform_minimap_main_map_handle, tile, 100)
-        config.tiles[tile_name].alpha = 100
-    end
-
-    refresh_minimap()
-    extend_pause_menu_map_bounds()
-end
-
-
--- export function: hides the specified tiles on the pause menu map.
--- @param tile_names A table containing the names of the tiles to hide.
-local function export_hide_tiles(tile_names)
-    if tile_names == nil then
-        return
-    end
-
-    for _, tile_name in ipairs(tile_names) do
-        local tile = {
-            name = tostring(tile_name),
-        }
-
-        set_tile_alpha(scaleform_minimap_main_map_handle, tile, 0)
-        config.tiles[tile_name].alpha = 0
-    end
-
-    refresh_minimap()
-    extend_pause_menu_map_bounds()
-end
-
-
--- export function: checks if a specific tile is visible on the pause menu map.
--- @param tile_name The name of the tile to check.
--- @return is_visible True if the tile is visible, false otherwise.
-local function export_is_tile_visible(tile_name)
-    local tile_config = config.tiles[tile_name]
-    if not tile_config then
-        return false
-    end
-
-    local alpha = tonumber(tile_config.alpha)
-    return alpha > 0
-end
-
-
--- export function: refreshes the minimap to apply changes.
-local function export_refresh_minimap()
-    refresh_minimap()
-end
-
-
-exports("show_tiles", export_show_tiles)
-exports("hide_tiles", export_hide_tiles)
-exports("is_tile_visible", export_is_tile_visible)
-exports("refresh_minimap", export_refresh_minimap)
-
 
 Citizen.CreateThread(function()
     -- Set up alphas
@@ -307,11 +168,11 @@ Citizen.CreateThread(function()
             local y_scale = tile_size
 
             if tile_config.x_scale then
-                x_scale = tile_size * tile_config.x_scale
+                x_scale = tile_size * math.abs(tile_config.x_scale)
             end
 
             if tile_config.y_scale then
-                y_scale = tile_size * tile_config.y_scale
+                y_scale = tile_size * math.abs(tile_config.y_scale)
             end
 
             local tile = {

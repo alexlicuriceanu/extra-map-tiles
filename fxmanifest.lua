@@ -8,8 +8,10 @@ author "L1CKS"
 version "2.1.0"
 
 client_scripts {
+  "utils.lua",
   "client.lua",
   "scaleforms.lua",
+  "exports.lua",
 }
 
 shared_scripts {
