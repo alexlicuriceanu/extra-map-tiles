@@ -6,7 +6,7 @@ local vBitmapStartY = 8400.0
 
 -- global variables
 local dummy_blips = {}
-local scaleform_minimap_main_map_handle = nil
+scaleform_minimap_main_map_handle = nil
 
 -- create an invisible blip at the specified coordinates.
 -- @param x The x coordinate of the blip.
@@ -22,7 +22,7 @@ end
 
 -- "hack" the pause menu map bounds by creating dummy blips
 -- at the corners of the furthest tiles.
-local function extend_pause_menu_map_bounds()
+function extend_pause_menu_map_bounds()
     -- for _, blip in ipairs(dummy_blips) do
     --     RemoveBlip(blip)
     -- end
@@ -216,4 +216,5 @@ Citizen.CreateThread(function()
             SetStreamedTextureDictAsNoLongerNeeded(config.radar_masks)
         end
     end
+
 end)

@@ -9,9 +9,9 @@ version "3.0.0"
 
 client_scripts {
   "utils.lua",
-  "client.lua",
   "scaleforms.lua",
   "exports.lua",
+  "client.lua",
 }
 
 shared_scripts {

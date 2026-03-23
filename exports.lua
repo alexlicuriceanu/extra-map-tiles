@@ -49,8 +49,12 @@ function export_is_tile_visible(tile_name)
         return false
     end
 
+    if tile_config.visible == false then
+        return false
+    end
+
     local alpha = tonumber(tile_config.alpha)
-    return alpha > 0 or (tile_config.visible == true)
+    return alpha > 0
 end
 
 -- export function: refreshes the minimap to apply changes.
@@ -167,15 +171,16 @@ function is_tile_centered(tile_name)
     return tile_config.centered == true
 end
 
+
 exports("show_tiles", export_show_tiles)
 exports("hide_tiles", export_hide_tiles)
 exports("is_tile_visible", export_is_tile_visible)
 exports("refresh_minimap", export_refresh_minimap)
-exports("get_tile_names", export_get_tile_names)
+exports("get_tile_names", export_get_tile_names)    --ok
 exports("set_tile_rotation", export_set_tile_rotation)
 exports("set_tile_alpha", export_set_tile_alpha)
 exports("set_tile_scale", export_set_tile_scale)
 exports("get_tile_rotation", export_get_tile_rotation)
-exports("get_tile_alpha", export_get_tile_alpha)
-exports("get_tile_scale", export_get_tile_scale)
-exports("is_tile_centered", is_tile_centered)
+exports("get_tile_alpha", export_get_tile_alpha)    -- ok
+exports("get_tile_scale", export_get_tile_scale)    -- ok 
+exports("is_tile_centered", is_tile_centered)   -- ok
