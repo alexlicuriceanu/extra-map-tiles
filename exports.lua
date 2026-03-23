@@ -12,7 +12,7 @@ function export_show_tiles(tile_names)
         }
 
         set_tile_alpha(scaleform_minimap_main_map_handle, tile)
-        config.tiles[tile_name].alpha = 100
+        config.tiles[tile_name].visible = true
     end
 
     refresh_minimap()
@@ -33,7 +33,7 @@ function export_hide_tiles(tile_names)
         }
 
         set_tile_alpha(scaleform_minimap_main_map_handle, tile)
-        config.tiles[tile_name].alpha = 0
+        config.tiles[tile_name].visible = false
     end
 
     refresh_minimap()
@@ -50,7 +50,7 @@ function export_is_tile_visible(tile_name)
     end
 
     local alpha = tonumber(tile_config.alpha)
-    return alpha > 0
+    return alpha > 0 or (tile_config.visible == true)
 end
 
 -- export function: refreshes the minimap to apply changes.
