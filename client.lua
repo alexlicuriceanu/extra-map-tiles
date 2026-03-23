@@ -74,14 +74,15 @@ function extend_pause_menu_map_bounds()
     -- table.insert(dummy_blips, create_dummy_blip(x_max, y_max))
 end
 
+
 Citizen.CreateThread(function()
     -- Set up fields for each tile in the configuration
     for tile_name, tile_config in pairs(config.tiles) do
-        config.tiles[tile_name].x_offset = tile_config.x_offset or 0
-        config.tiles[tile_name].y_offset = tile_config.y_offset or 0
-        config.tiles[tile_name].x_scale = tile_config.x_scale or 1.0
-        config.tiles[tile_name].y_scale = tile_config.y_scale or 1.0
-        config.tiles[tile_name].alpha = tile_config.alpha or 100
+        config.tiles[tile_name].x_offset = 1.0 * (tile_config.x_offset or 0)
+        config.tiles[tile_name].y_offset = 1.0 * (tile_config.y_offset or 0)
+        config.tiles[tile_name].x_scale = 1.0 * (tile_config.x_scale or 1.0)
+        config.tiles[tile_name].y_scale = 1.0 * (tile_config.y_scale or 1.0)
+        config.tiles[tile_name].alpha = math.floor(tonumber(tile_config.alpha) or 100)
         config.tiles[tile_name].rotation = tile_config.rotation or 0.0
         config.tiles[tile_name].centered = tile_config.centered or false
         config.tiles[tile_name].visible = tile_config.visible or true
@@ -98,30 +99,29 @@ Citizen.CreateThread(function()
 
     -- Set up general scaleform parameters
     -- DO NOT MODIFY
-    local x_scale = 100 
-    local y_scale = 100
-    local x_origin = 864.0
-    local y_origin = 1440.0
+    local scaleform_x_origin = 864.0
+    local scaleform_y_origin = 1440.0
+    local scaleform_mc_width = 1728.0
+    local scaleform_mc_height = 2880.0
 
     local world_width = 9216
     local world_height = 15360.002
-    local scaleform_mc_width = 1728.0
-    local scaleform_mc_height = 2880.0
+    
 
     local scale_factor = world_width / scaleform_mc_width
 
     local x_offset = 360 / scale_factor
     local y_offset = 600 / scale_factor
 
-    x_origin_game = x_origin
-    y_origin_game = y_origin
+    scaleform_x_origin_game = scaleform_x_origin
+    scaleform_y_origin_game = scaleform_y_origin
 
-    x_origin = x_origin + x_offset
-    y_origin = y_origin + y_offset
+    scaleform_x_origin = scaleform_x_origin + x_offset
+    scaleform_y_origin = scaleform_y_origin + y_offset
     tile_size = vBitmapTileSizeX / scale_factor
 
-    x_origin = x_origin - tile_size
-    y_origin = y_origin - 2 * tile_size
+    scaleform_x_origin = scaleform_x_origin - tile_size
+    scaleform_y_origin = scaleform_y_origin - 2 * tile_size
     -- END DO NOT MODIFY
 
     -- Draw the extra tiles
@@ -129,49 +129,41 @@ Citizen.CreateThread(function()
         local tile_config = config.tiles[tile_name]
         
         if tile_config then
-            local x = x_origin + (tile_config.x_offset or 0) * tile_size
-            local y = y_origin + (tile_config.y_offset or 0) * tile_size
+            local scaleform_x = scaleform_x_origin + (tile_config.x_offset or 0) * tile_size
+            local scaleform_y = scaleform_y_origin + (tile_config.y_offset or 0) * tile_size
 
             -- Convert tile XY from game units to scaleform units
             if tile_config.x then
-                x = x_origin_game + tile_config.x / scale_factor
+                scaleform_x = scaleform_x_origin_game + tile_config.x / scale_factor
             end
 
             if tile_config.y then
-                y = y_origin_game - tile_config.y / scale_factor
+                scaleform_y = scaleform_y_origin_game - tile_config.y / scale_factor
             end
 
             -- Apply small offset to overlap tiles and prevent gaps
             if tile_config.x_offset then
-                x = x - (config.offset * tile_config.x_offset)
+                scaleform_x = scaleform_x - (config.offset * tile_config.x_offset)
             end
             
             if tile_config.y_offset then
-                y = y - (config.offset * (tile_config.y_offset or 0))
+                scaleform_y = scaleform_y - (config.offset * (tile_config.y_offset or 0))
             end
 
-            local x_scale = tile_size
-            local y_scale = tile_size
-
-            if tile_config.x_scale then
-                x_scale = tile_size * math.abs(tile_config.x_scale)
-            end
-
-            if tile_config.y_scale then
-                y_scale = tile_size * math.abs(tile_config.y_scale)
-            end
+            local scaleform_width = tile_size * (math.abs(tile_config.x_scale) or 1.0)
+            local scaleform_height = tile_size * (math.abs(tile_config.y_scale) or 1.0)
 
             local tile = {
                 name = tostring(tile_name),
                 txd = tile_config.txd,
                 txn = tile_config.txn,
-                x = x,
-                y = y,
-                width = x_scale or tile_size,
-                height = y_scale or tile_size,
+                x = scaleform_x,
+                y = scaleform_y,
+                width = scaleform_width,
+                height = scaleform_height,
                 centered = tile_config.centered or false,
                 alpha = tile_config.alpha or 100,
-                rotation = tile_config.rotation or 0.0,
+                rotation = 1.0 * (tile_config.rotation or 0.0),
             }
 
             draw_tile(scaleform_minimap_main_map_handle, tile)
