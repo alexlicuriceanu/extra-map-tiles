@@ -139,6 +139,12 @@ Citizen.CreateThread(function()
 
     -- Load texture dictionaries and main map scaleform
     local loaded_texture_dictionaries = load_texture_dictionaries(config.tiles)
+
+    -- Wait for the minimap to render before doing anything else
+    while not IsMinimapRendering() do
+        Citizen.Wait(0)
+    end
+    
     scaleform_minimap_main_map_handle = load_scaleform(config.scaleform_minimap_main_map)
 
     -- Clean any leftover textures in the main map scaleform
